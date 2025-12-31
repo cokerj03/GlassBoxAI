@@ -8,10 +8,12 @@ Purpose:      Displays explainable AI reasoning
 ==================================================
 */
 
+"use client";
+
 import { useState } from "react";
 
 export default function ExplainabilityAccordion({
-  explanation,
+  explanation
 }: {
   explanation: string;
 }) {
@@ -19,19 +21,10 @@ export default function ExplainabilityAccordion({
 
   return (
     <div className="accordion">
-      <button
-        className="accordion-toggle"
-        onClick={() => setOpen(!open)}
-        aria-expanded={open}
-      >
-        Why this decision?
+      <button onClick={() => setOpen(!open)}>
+        Explain Decision
       </button>
-
-      {open && (
-        <div className="accordion-content">
-          <p>{explanation}</p>
-        </div>
-      )}
+      {open && <p>{explanation}</p>}
     </div>
   );
 }

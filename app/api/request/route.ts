@@ -8,8 +8,11 @@ Purpose:      Accepts and stores user-submitted AI
 ==================================================
 */
 
+export const dynamic = "force-dynamic";
+
+
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/db/supabase.server";
+import { getSupabaseServer } from "@/lib/db/supabase.server";
 
 export async function POST(req: Request) {
   const { userId, inputType, inputText } = await req.json();
@@ -20,6 +23,8 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
+    const supabase = getSupabaseServer();
+
 
   const { data, error } = await supabase
     .from("requests")

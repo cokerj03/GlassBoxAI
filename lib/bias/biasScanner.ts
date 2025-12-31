@@ -12,6 +12,7 @@ import { BiasAudit, ScoringResult } from "@/lib/types";
 import { BIAS_RULES } from "./biasRules";
 import { detectGenderedLanguage } from "./genderedLanguage";
 
+
 export function scanBias(
   scoring: ScoringResult,
   jobText?: string

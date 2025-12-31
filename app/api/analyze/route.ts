@@ -9,11 +9,14 @@ Purpose:      Performs AI analysis on an existing
               ethics audits.
 ==================================================
 */
+export const dynamic = "force-dynamic";
+
 
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/db/supabase.server";
+import { getSupabaseServer } from "@/lib/db/supabase.server";
+import { runAIDecisionPipeline } from "../../../lib/ai/decisionPipeline";
 
-import { runAIDecisionPipeline } from "@/lib/ai/decisionPipeline";
+
 
 export async function POST(req: Request) {
   const { requestId } = await req.json();
@@ -25,6 +28,8 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
+
+  const supabase = getSupabaseServer();
 
   // 2️⃣ Retrieve original request
   const { data: request, error: requestError } = await supabase

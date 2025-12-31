@@ -6,29 +6,43 @@ Purpose:      Returns a logged-in user's recent
               audit requests for history display.
 ==================================================
 */
+export const dynamic = "force-dynamic";
+
 
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/db/supabase.server";
+import { getSupabaseServer } from "@/lib/db/supabase.server";
 
 export async function GET() {
-  // NOTE: This assumes your server client can read auth
-  // If not, we can switch to a cookie-based Supabase server client next.
-  const { data: auth } = await supabase.auth.getUser();
+  // ✅ 1. Create server client FIRST
+  const supabase = getSupabaseServer();
 
-  if (!auth?.user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  // ✅ 2. Read authenticated user
+  const {
+    data: { user },
+    error: authError
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json(
+      { error: "Not authenticated" },
+      { status: 401 }
+    );
   }
 
+  // ✅ 3. Fetch request history
   const { data, error } = await supabase
     .from("requests")
     .select("id, created_at, input_type")
-    .eq("user_id", auth.user.id)
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(20);
+    .limit(10);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch history" },
+      { status: 500 }
+    );
   }
 
-  return NextResponse.json({ items: data ?? [] });
+  return NextResponse.json({ history: data });
 }

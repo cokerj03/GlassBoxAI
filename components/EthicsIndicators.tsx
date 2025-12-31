@@ -1,65 +1,49 @@
 /*
 ==================================================
 File Name:    EthicsIndicators.tsx
-Created On:   12/30/2025
+Created On:   12/29/2025
 Purpose:      Displays ethics risk indicators,
-              bias flags with severity icons,
-              and audit-friendly summaries.
+              bias flags, and severity level.
 ==================================================
 */
 
-type RiskLevel = "LOW" | "MEDIUM" | "HIGH";
-type Severity = "LOW" | "MEDIUM" | "HIGH";
-
-function inferSeverity(flag: string): Severity {
-  const f = flag.toLowerCase();
-
-  // You can refine this list as your bias rules evolve
-  if (f.includes("gender") || f.includes("missing data") || f.includes("penalty")) return "HIGH";
-  if (f.includes("education") || f.includes("overweight") || f.includes("weighting")) return "MEDIUM";
-  return "LOW";
-}
-
-function iconForSeverity(sev: Severity) {
-  if (sev === "HIGH") return "⛔";
-  if (sev === "MEDIUM") return "⚠️";
-  return "ℹ️";
-}
+type EthicsIndicatorsProps = {
+  riskLevel: "LOW" | "MEDIUM" | "HIGH";
+  flags: string[];
+  notes?: string;
+};
 
 export default function EthicsIndicators({
   riskLevel,
   flags,
-  notes,
-}: {
-  riskLevel: RiskLevel;
-  flags: string[];
-  notes?: string;
-}) {
+  notes
+}: EthicsIndicatorsProps) {
   return (
-    <div className="ethics-panel">
-      <div className={`ethics-risk risk-${riskLevel.toLowerCase()}`}>
-        Ethics Risk: <strong>{riskLevel}</strong>
-      </div>
+    <div className="card mt-1">
+      <p>
+        Risk Level:{" "}
+        <strong className={`risk-${riskLevel.toLowerCase()}`}>
+          {riskLevel}
+        </strong>
+      </p>
 
-      {flags?.length ? (
-        <ul className="ethics-flags">
-          {flags.map((flag, idx) => {
-            const sev = inferSeverity(flag);
-            return (
-              <li key={idx} className={`flag flag-${sev.toLowerCase()}`}>
-                <span className="flag-icon" aria-hidden="true">
-                  {iconForSeverity(sev)}
-                </span>
-                <span className="flag-text">{flag}</span>
-              </li>
-            );
-          })}
-        </ul>
+      <h4 className="mt-1">Bias Flags</h4>
+      {flags.length === 0 ? (
+        <p className="opacity-muted">No bias flags detected.</p>
       ) : (
-        <p className="opacity-muted">No significant bias indicators detected.</p>
+        <ul>
+          {flags.map((flag) => (
+            <li key={flag}>{flag}</li>
+          ))}
+        </ul>
       )}
 
-      {notes ? <p className="opacity-muted">{notes}</p> : null}
+      {notes && (
+        <>
+          <h4 className="mt-1">Notes</h4>
+          <p className="opacity-muted">{notes}</p>
+        </>
+      )}
     </div>
   );
 }

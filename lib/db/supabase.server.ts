@@ -2,15 +2,21 @@
 ==================================================
 File Name:    supabase.server.ts
 Created On:   12/30/2025
-Purpose:      Supabase server-side client for
-              API routes and backend logic.
-              Uses service role key.
+Purpose:      Lazy, server-safe Supabase client
+              for API routes and server actions.
 ==================================================
 */
 
 import { createClient } from "@supabase/supabase-js";
 
-export const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+export function getSupabaseServer() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    // IMPORTANT: do NOT crash during build
+    throw new Error("Supabase environment variables not configured");
+  }
+
+  return createClient(url, key);
+}

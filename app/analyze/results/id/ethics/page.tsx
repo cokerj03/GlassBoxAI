@@ -1,3 +1,4 @@
+
 /*
 ==================================================
 File Name:    page.tsx
@@ -27,39 +28,59 @@ export default function EthicsPage({ params }: { params: { id: string } }) {
     })();
   }, [requestId]);
 
-  if (error) return <main style={{ padding: "3rem 1.25rem" }}>⚠️ {error}</main>;
-  if (!data) return <main style={{ padding: "3rem 1.25rem" }}>Loading...</main>;
+  if (error) {
+    return (
+      <main>
+        <p className="opacity-muted">⚠️ {error}</p>
+      </main>
+    );
+  }
+
+  if (!data) {
+    return (
+      <main>
+        <p className="opacity-muted">Loading...</p>
+      </main>
+    );
+  }
 
   const flags: string[] = data.bias_flags ?? [];
 
   return (
-    <main style={{ maxWidth: 960, margin: "0 auto", padding: "3rem 1.25rem" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>Ethics Breakdown</h1>
+    <main>
+      <h1>Ethics Breakdown</h1>
 
-      <div style={cardStyle}>
+      <div className="card mt-2">
         <p>
-          Risk Level: <strong>{data.risk_level}</strong>
+          Risk Level:{" "}
+          <strong className={`risk-${data.risk_level.toLowerCase()}`}>
+            {data.risk_level}
+          </strong>
         </p>
 
-        <h3>Bias Flags</h3>
+        <h3 className="mt-1">Bias Flags</h3>
         {flags.length === 0 ? (
-          <p>No flags detected.</p>
+          <p className="opacity-muted">No flags detected.</p>
         ) : (
           <ul>
-            {flags.map((f) => (
-              <li key={f}>{f}</li>
+            {flags.map((flag) => (
+              <li key={flag}>{flag}</li>
             ))}
           </ul>
         )}
 
-        <h3>Fairness Notes</h3>
-        <p style={{ lineHeight: 1.6 }}>{data.fairness_notes}</p>
+        <h3 className="mt-1">Fairness Notes</h3>
+        <p>{data.fairness_notes}</p>
 
-        <div style={{ marginTop: "1rem", display: "flex", gap: "0.75rem" }}>
-          <Link href={`/analyze/results?id=${requestId}`} style={btnStyle}>
+        <div className="flex mt-2">
+          <Link
+            href={`/analyze/results?id=${requestId}`}
+            className="button button-secondary"
+          >
             Back to Results
           </Link>
-          <Link href="/analyze" style={btnStyleSecondary}>
+
+          <Link href="/analyze" className="button">
             New Audit
           </Link>
         </div>

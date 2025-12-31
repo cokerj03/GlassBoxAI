@@ -6,9 +6,11 @@ Purpose:      Returns ethics audit for a requestId
               including risk level and flags.
 ==================================================
 */
+export const dynamic = "force-dynamic";
+
 
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/db/supabase.server";
+import { getSupabaseServer } from "@/lib/db/supabase.server";
 
 
 export async function GET(
@@ -16,6 +18,8 @@ export async function GET(
   { params }: { params: { requestId: string } }
 ) {
   const requestId = params.requestId;
+
+   const supabase = getSupabaseServer();
 
   const { data, error } = await supabase
     .from("ethics_audit")

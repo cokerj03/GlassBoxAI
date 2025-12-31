@@ -8,18 +8,18 @@ Purpose:      Displays the AI decision outcome
 ==================================================
 */
 
-type Decision = "PASS" | "REVIEW" | "REJECT";
-
-export default function DecisionBadge({ decision }: { decision: Decision }) {
-  const classMap: Record<Decision, string> = {
-    PASS: "badge-pass",
-    REVIEW: "badge-review",
-    REJECT: "badge-reject",
-  };
+export default function DecisionBadge({ decision }: { decision: string }) {
+  const color =
+    decision === "APPROVE"
+      ? "risk-low"
+      : decision === "REVIEW"
+      ? "risk-medium"
+      : "risk-high";
 
   return (
-    <span className={`decision-badge ${classMap[decision]}`}>
+    <div className={`decision-badge ${color}`}>
       {decision}
-    </span>
+    </div>
   );
 }
+

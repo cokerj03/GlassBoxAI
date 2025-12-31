@@ -6,14 +6,19 @@ Purpose:      Retrieves AI decision results and
               explanations for a specific request.
 ==================================================
 */
+export const dynamic = "force-dynamic";
+
 
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/db/supabase.server";
+import { getSupabaseServer } from "@/lib/db/supabase.server";
 
 export async function GET(
   _req: Request,
   { params }: { params: { id: string } }
 ) {
+
+    const supabase = getSupabaseServer();
+    
   const { data, error } = await supabase
     .from("ai_results")
     .select("*")
