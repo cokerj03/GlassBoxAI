@@ -1,83 +1,95 @@
 /*
 ==================================================
 File Name:    login-client.tsx
-Purpose:      Client-side login + verification banner
+Purpose:      Password-based login using Supabase
 ==================================================
 */
 
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getSupabaseBrowser } from "@/lib/db/supabase.browser";
 
 export default function LoginClient() {
+  const router = useRouter();
   const supabase = getSupabaseBrowser();
-  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [verified, setVerified] = useState(false);
-  const [reason, setReason] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    if (searchParams.get("verified") === "1") {
-      setVerified(true);
-    }
-    setReason(searchParams.get("reason"));
-  }, [searchParams]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleLogin() {
+    setLoading(true);
+    setError(null);
+
     try {
-      const { error } = await supabase.auth.signInWithOtp({ email });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
       if (error) throw error;
+
+      router.push("/analyze");
     } catch (e: any) {
       setError(e.message ?? "Login failed");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
     <main className="page-narrow">
-      {verified && (
-        <div className="card mt-2">
-          <p className="risk-low">
-            ✅ Your email has been verified. You may now log in.
-          </p>
-        </div>
-      )}
-
-      {reason === "auth" && (
-        <div className="card mt-2">
-          <p className="risk-medium">
-            🔒 Please log in to access that page.
-          </p>
-        </div>
-      )}
-
-      <div className="card mt-2">
+      <div className="card">
         <h2>Login</h2>
 
+        <label>Email</label>
         <input
           type="email"
-          placeholder="Email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
         />
 
-        <button className="button mt-2" onClick={handleLogin}>
-          Send Login Link
+        <label>Password</label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+        />
+
+        {error && (
+          <p className="risk-high mt-1">
+            ⚠️ {error}
+          </p>
+        )}
+
+        <button
+          className="button mt-2"
+          onClick={handleLogin}
+          disabled={loading}
+        >
+          {loading ? "Logging in…" : "Login"}
         </button>
 
-        {error && <p className="risk-high mt-1">⚠️ {error}</p>}
-      </div>
+        <div className="mt-2">
+          <Link href="/forgot-password" className="nav-link">
+            Forgot your password?
+          </Link>
+        </div>
 
-      <p className="opacity-muted mt-2">
-        Don’t have an account?{" "}
-        <Link href="/signup" className="nav-link">
-          Sign up
-        </Link>
-      </p>
+        <p className="opacity-muted mt-2">
+          Don’t have an account?{" "}
+          <Link href="/signup" className="nav-link">
+            Sign up
+          </Link>
+        </p>
+      </div>
     </main>
   );
 }

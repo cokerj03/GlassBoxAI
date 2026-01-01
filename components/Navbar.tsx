@@ -8,120 +8,70 @@ Purpose:      Global navigation bar with
 
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { getSupabaseBrowser } from "@/lib/db/supabase.browser";
-import type { User } from "@supabase/supabase-js";
 
 export default function Navbar() {
-  const router = useRouter();
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [user, setUser] = useState<any>(null);
+  const [ready, setReady] = useState(false);
 
-  const [open, setOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-
-  /* --------------------------------------------
-     Auth state tracking
-  -------------------------------------------- */
   useEffect(() => {
     const supabase = getSupabaseBrowser();
-    if (!supabase) return;
 
-    // Initial session
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user ?? null);
-    });
-
-    // Listen for auth changes
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, []);
-
-  /* --------------------------------------------
-     Close menu on outside click
-  -------------------------------------------- */
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
+    // ✅ HARD GUARD — prevents crash
+    if (!supabase) {
+      setReady(true);
+      return;
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user ?? null);
+      setReady(true);
+    });
   }, []);
 
-  /* --------------------------------------------
-     Logout
-  -------------------------------------------- */
-  async function handleLogout() {
-    const supabase = getSupabaseBrowser();
-    if (!supabase) return;
-
-    await supabase.auth.signOut();
-    setUser(null);
-    setOpen(false);
-    router.push("/");
-  }
+  // Optional: avoid flicker
+  if (!ready) return null;
 
   return (
     <nav className="navbar">
-      <div className="navbar-inner" ref={menuRef}>
-        {/* MOBILE MENU BUTTON */}
-        <button
-          className="nav-toggle"
-          aria-label="Toggle navigation"
-          onClick={() => setOpen(!open)}
-        >
-          ☰
-        </button>
+      <div className="navbar-inner">
+        
 
-        {/* NAV LINKS */}
-        <div className={`navbar-links ${open ? "open" : ""}`}>
-          <Link href="/" className="nav-link" onClick={() => setOpen(false)}>
-            Home
-          </Link>
-
-          <Link href="/analyze" className="nav-link" onClick={() => setOpen(false)}>
+        <div className="navbar-links">
+          <Link href="/analyze" className="nav-link">
             Analyze
           </Link>
 
-          {!user && (
+          {user ? (
             <>
-              <Link
-                href="/login"
-                className="nav-link"
-                onClick={() => setOpen(false)}
-              >
-                Login
+              <Link href="/account" className="nav-link">
+                {user.email?.split("@")[0]}
               </Link>
 
-              <Link
-                href="/signup"
-                className="nav-link nav-accent"
-                onClick={() => setOpen(false)}
+              <button
+                className="nav-link-button"
+                onClick={async () => {
+                  const supabase = getSupabaseBrowser();
+                  if (supabase) {
+                    await supabase.auth.signOut();
+                    window.location.href = "/";
+                  }
+                }}
               >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="nav-link">
+                Login
+              </Link>
+              <Link href="/signup" className="nav-link nav-accent">
                 Sign Up
               </Link>
             </>
-          )}
-
-          {user && (
-            <button
-              className="nav-link-button nav-link"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
           )}
         </div>
       </div>
