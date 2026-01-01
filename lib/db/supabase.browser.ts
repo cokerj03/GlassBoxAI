@@ -11,15 +11,13 @@ Purpose:      Supabase browser client for
 import { createClient } from "@supabase/supabase-js";
 
 export function getSupabaseBrowser() {
-  if (
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  ) {
-    throw new Error("Supabase browser env vars missing");
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    console.warn("Supabase env vars missing");
+    return null;
   }
 
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  return createClient(url, key);
 }

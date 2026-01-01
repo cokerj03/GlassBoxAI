@@ -11,6 +11,7 @@ Purpose:      Submission form to create an AI
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import AuthGuard from "@/components/AuthGuard";
 
 export default function AnalyzePage() {
   const router = useRouter();

@@ -14,7 +14,7 @@ Purpose:      Global styling for GlassBoxAI.
    GLASSBOX THEME VARIABLES
    ================================================== */
 :root {
-  --bg-main: #0b0f14;
+  --bg-main: url("/images/liquid-bg.png");
 
   --bg-glass: rgba(255, 255, 255, 0.1);
   --bg-glass-soft: rgba(255, 255, 255, 0.06);
@@ -42,13 +42,19 @@ Purpose:      Global styling for GlassBoxAI.
 * {
   box-sizing: border-box;
 }
+html {
+  min-height: 100%;
+  background: url("/images/liquid-bg.png") center / cover no-repeat fixed;
+}
 
 html,
 body {
   margin: 0;
   padding: 0;
-  min-height: 100%;
+  height: 100%;
+  width: 100%;
   color: var(--text-primary);
+  background: var(--bg-main);
 
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
@@ -59,26 +65,12 @@ body {
 }
 
 
-/* ==================================================
-   IMAGE BACKGROUND SUBSTRATE (LIQUID SOURCE)
-   ================================================== */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -10;
-  pointer-events: none;
-
-  background:
-    url("/images/liquid-bg.png") center / cover no-repeat;
-
-
-}
 
 /* ==================================================
    NOISE + LIGHT OVERLAY (CRITICAL FOR GLASS)
    ================================================== */
 body::after {
+ 
   content: "";
   position: fixed;
   inset: 0;
@@ -102,7 +94,6 @@ body::after {
    ================================================== */
 .page-glass {
   min-height: calc(100vh - 56px);
-
   background: rgba(255, 255, 255, 0.08);
 
   backdrop-filter: blur(32px) saturate(140%);
@@ -117,10 +108,7 @@ body::after {
   position: relative;
 }
 
-.page-glass > * {
-  position: relative;
-  z-index: 1;
-}
+
 
 /* ==================================================
    LAYOUT
@@ -147,25 +135,25 @@ h1 {
   font-size: 2.6rem;
   font-weight: 600;
   letter-spacing: -0.025em;
-  color: rgba(15, 25, 40, 0.95);
+  color: var(--text-primary);
 }
 
 h2 {
   font-size: 1.7rem;
   font-weight: 500;
-  color: rgba(15, 25, 40, 0.9);
+  color: var(--text-primary);
 }
 
 h3 {
   font-size: 1.15rem;
   font-weight: 500;
-  color: rgba(15, 25, 40, 0.9);
+  color: var(--text-primary);
 }
 
 p {
   font-size: 0.95rem;
   line-height: 1.65;
-  color: rgba(15, 25, 40, 0.7);
+  color: var(--text-secondary);
 }
 
 
@@ -238,6 +226,26 @@ p {
 
   pointer-events: none;
 }
+
+.nav-accent {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.nav-accent:hover {
+  color: white;
+  text-shadow: 0 0 12px rgba(143, 211, 244, 0.6);
+}
+
+.nav-link-button {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+
 /* ==================================================
    MOBILE NAV TOGGLE
    ================================================== */

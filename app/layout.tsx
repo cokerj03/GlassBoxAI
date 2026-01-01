@@ -8,11 +8,10 @@ Purpose:      Root layout with global navbar
 */
 
 import "./globals.css";
-import Navbar from "../components/Navbar";
-
+import Navbar from "@/components/Navbar";
 
 export default function RootLayout({
-  children
+  children,
 }: {
   children: React.ReactNode;
 }) {
@@ -20,9 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Navbar />
-        <div className="page-glass">
-    {children}
-  </div>
+        <div className="page-glass">{children}</div>
       </body>
     </html>
   );
