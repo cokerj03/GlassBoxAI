@@ -8,16 +8,24 @@
 // ==========================================
 
 import { getUser } from "@/lib/auth"
-import { supabase } from "@/lib/supabase"
+import { supabaseServer } from "@/lib/supabaseServer"
+
+type UserIntelligenceSnapshotRow = {
+  target_role: string
+  strengths: string[]
+  growth_areas: string[]
+  avg_confidence: number
+}
 
 export default async function UserIntelligenceSnapshot() {
   const user = await getUser()
+  if (!user) return null
 
-  const { data } = await supabase
+  const { data } = await supabaseServer
     .from("user_intelligence_snapshots")
     .select("*")
     .eq("user_id", user.id)
-    .single()
+    .single<UserIntelligenceSnapshotRow>()
 
   if (!data) return null
 

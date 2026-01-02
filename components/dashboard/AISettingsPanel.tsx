@@ -6,16 +6,17 @@
 //               and persist preferences to Supabase.
 // ==========================================
 
-"use client"
 
 import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabaseClient"
 
 type Preferences = {
   tone: number
   risk: number
   detail: number
 }
+
+type PreferencesRow = Preferences
 
 export default function AISettingsPanel({ userId }: { userId: string }) {
   const [prefs, setPrefs] = useState<Preferences>({
@@ -25,45 +26,42 @@ export default function AISettingsPanel({ userId }: { userId: string }) {
   })
 
   useEffect(() => {
-    supabase
+    supabaseClient
       .from("ai_preferences")
       .select("*")
       .eq("user_id", userId)
       .single()
-      .then(({ data }) => {
+      .then(({ data }: { data: PreferencesRow | null }) => {
         if (data) setPrefs(data)
       })
   }, [userId])
 
   function update(key: keyof Preferences, value: number) {
     setPrefs((prev) => ({ ...prev, [key]: value }))
-  }
 
-  async function save() {
-    await supabase
+    supabaseClient
       .from("ai_preferences")
-      .upsert({ user_id: userId, ...prefs })
+      .update({ [key]: value })
+      .eq("user_id", userId)
   }
 
   return (
     <div className="card">
-      <h3 className="card-title">🎛 AI Preferences</h3>
+      <h3 className="card-title">⚙️ AI Settings</h3>
 
-      {(["tone", "risk", "detail"] as const).map((key) => (
+      {(["tone", "risk", "detail"] as (keyof Preferences)[]).map((key) => (
         <div key={key} className="mt-4">
-          <label className="text-sm capitalize">{key}</label>
+          <label className="text-sm font-medium capitalize">{key}</label>
           <input
             type="range"
+            min={0}
+            max={100}
             value={prefs[key]}
             onChange={(e) => update(key, Number(e.target.value))}
             className="w-full"
           />
         </div>
       ))}
-
-      <button onClick={save} className="btn-primary mt-6 w-full">
-        Save Preferences
-      </button>
     </div>
   )
 }

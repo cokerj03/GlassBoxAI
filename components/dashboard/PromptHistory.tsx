@@ -7,12 +7,19 @@
 // ==========================================
 
 import { getUser } from "@/lib/auth"
-import { supabase } from "@/lib/supabase"
+import { supabaseServer } from "@/lib/supabaseServer"
+
+type PromptHistoryItem = {
+  id: string
+  title: string
+  confidence_score: number
+}
 
 export default async function PromptHistory() {
   const user = await getUser()
+  if (!user) return null
 
-  const { data } = await supabase
+  const { data } = await supabaseServer
     .from("prompt_history")
     .select("id, title, confidence_score")
     .eq("user_id", user.id)
@@ -25,7 +32,7 @@ export default async function PromptHistory() {
       <h3 className="card-title">🕘 Prompt History</h3>
 
       <ul className="mt-4 space-y-3">
-        {data.map((prompt) => (
+        {data.map((prompt: PromptHistoryItem) => (
           <li
             key={prompt.id}
             className="flex justify-between items-center"

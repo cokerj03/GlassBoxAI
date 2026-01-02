@@ -6,13 +6,17 @@
 //               based on logged outputs.
 // ==========================================
 
+
 import { getUser } from "@/lib/auth"
-import { supabase } from "@/lib/supabase"
+import { supabaseServer } from "@/lib/supabaseServer"
 
 export default async function ConfidenceTimeline() {
   const user = await getUser()
 
-  const { data } = await supabase
+  // ✅ Explicit guard satisfies TypeScript
+  if (!user) return null
+
+  const { data } = await supabaseServer
     .from("ai_confidence_logs")
     .select("confidence_score, created_at")
     .eq("user_id", user.id)
@@ -37,10 +41,6 @@ export default async function ConfidenceTimeline() {
           </div>
         ))}
       </div>
-
-      <p className="text-xs text-muted-foreground mt-4">
-        Confidence reflects certainty, not correctness.
-      </p>
     </div>
   )
 }

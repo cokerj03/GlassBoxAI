@@ -7,23 +7,29 @@
 // ==========================================
 
 import { getUser } from "@/lib/auth"
-import { supabase } from "@/lib/supabase"
+import { supabaseServer } from "@/lib/supabaseServer"
 
 type Factor = {
   label: string
   weight: number
 }
 
+type ExplanationRow = {
+  factors: Factor[]
+  tradeoff: string
+}
+
 export default async function WhyThisOutputPanel() {
   const user = await getUser()
+  if (!user) return null
 
-  const { data } = await supabase
+  const { data } = await supabaseServer
     .from("ai_explanations")
     .select("factors, tradeoff")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(1)
-    .single()
+    .single<ExplanationRow>()
 
   if (!data) return null
 
