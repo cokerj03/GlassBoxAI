@@ -5,91 +5,63 @@ Purpose:      Password-based login using Supabase
 ==================================================
 */
 
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { getSupabaseBrowser } from "@/lib/db/supabase.browser";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { supabaseClient } from "@/lib/supabaseClient"
 
 export default function LoginClient() {
-  const router = useRouter();
-  const supabase = getSupabaseBrowser();
+  const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password,
+    })
 
-  async function handleLogin() {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
-
-      router.push("/analyze");
-    } catch (e: any) {
-      setError(e.message ?? "Login failed");
-    } finally {
-      setLoading(false);
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+      return
     }
+
+    router.push("/dashboard")
   }
 
   return (
-    <main className="page-narrow">
-      <div className="card">
-        <h2>Login</h2>
+    <form onSubmit={handleLogin} className="space-y-4">
+      <input
+        type="email"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="input w-full"
+        placeholder="Email"
+      />
 
-        <label>Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-        />
+      <input
+        type="password"
+        required
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="input w-full"
+        placeholder="Password"
+      />
 
-        <label>Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
-        />
+      {error && <p className="text-sm text-red-500">{error}</p>}
 
-        {error && (
-          <p className="risk-high mt-1">
-            ⚠️ {error}
-          </p>
-        )}
-
-        <button
-          className="button mt-2"
-          onClick={handleLogin}
-          disabled={loading}
-        >
-          {loading ? "Logging in…" : "Login"}
-        </button>
-
-        <div className="mt-2">
-          <Link href="/forgot-password" className="nav-link">
-            Forgot your password?
-          </Link>
-        </div>
-
-        <p className="opacity-muted mt-2">
-          Don’t have an account?{" "}
-          <Link href="/signup" className="nav-link">
-            Sign up
-          </Link>
-        </p>
-      </div>
-    </main>
-  );
+      <button disabled={loading} className="btn-primary w-full">
+        {loading ? "Signing in..." : "Sign In"}
+      </button>
+    </form>
+  )
 }

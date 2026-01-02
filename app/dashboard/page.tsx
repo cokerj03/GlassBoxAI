@@ -20,6 +20,7 @@ import AISettingsPanel from "@/components/dashboard/AISettingsPanel"
 
 export default async function DashboardPage() {
   const user = await getUser()
+  if (!user) return null // ✅ REQUIRED for TS + build
 
   return (
     <section className="space-y-6">

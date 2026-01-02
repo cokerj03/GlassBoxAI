@@ -7,10 +7,11 @@
 // Notes:        Keeps components clean and testable.
 // ==========================================
 
-import { supabase } from "./supabaseServer"
+import { supabaseServer } from "./supabaseServer"
 
 export async function getUserSnapshot(userId: string) {
-  return supabase
+    return supabaseServer
+
     .from("user_intelligence_snapshots")
     .select("*")
     .eq("user_id", userId)
@@ -18,7 +19,8 @@ export async function getUserSnapshot(userId: string) {
 }
 
 export async function getConfidenceTimeline(userId: string) {
-  return supabase
+    return supabaseServer
+
     .from("ai_confidence_logs")
     .select("confidence_score, created_at")
     .eq("user_id", userId)
@@ -26,7 +28,8 @@ export async function getConfidenceTimeline(userId: string) {
 }
 
 export async function getLatestExplanation(userId: string) {
-  return supabase
+    return supabaseServer
+
     .from("ai_explanations")
     .select("*")
     .eq("user_id", userId)
@@ -36,7 +39,8 @@ export async function getLatestExplanation(userId: string) {
 }
 
 export async function getUserPreferences(userId: string) {
-  return supabase
+    return supabaseServer
+
     .from("ai_preferences")
     .select("*")
     .eq("user_id", userId)
@@ -46,14 +50,16 @@ export async function getUserPreferences(userId: string) {
 export async function updateUserPreferences(
   userId: string,
   prefs: { tone: number; risk: number; detail: number }
-) {
-  return supabase
+) {  
+  return supabaseServer
+
     .from("ai_preferences")
     .upsert({ user_id: userId, ...prefs })
 }
 
 export async function getPromptHistory(userId: string) {
-  return supabase
+    return supabaseServer
+
     .from("prompt_history")
     .select("*")
     .eq("user_id", userId)

@@ -1,54 +1,54 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { getSupabaseBrowser } from "@/lib/db/supabase.browser";
+import { useState } from "react"
+import { supabaseClient } from "@/lib/supabaseClient"
 
 export default function ResetPasswordPage() {
-  const supabase = getSupabaseBrowser();
-  const router = useRouter();
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
 
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  async function handleUpdate(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
 
-  async function handleUpdate() {
-    const { error } = await supabase.auth.updateUser({ password });
+    const { error } = await supabaseClient.auth.updateUser({
+      password,
+    })
 
     if (error) {
-      setError(error.message);
+      setError(error.message)
     } else {
-      setSuccess(true);
-      setTimeout(() => router.push("/login"), 1500);
+      setSuccess(true)
     }
   }
 
   return (
-    <main className="page-narrow">
-      <div className="card">
-        <h2>Reset Password</h2>
+    <div className="max-w-md mx-auto mt-12">
+      <h1 className="text-xl font-semibold">Reset Password</h1>
 
-        {success ? (
-          <p className="risk-low">
-            ✅ Password updated. Redirecting to login…
-          </p>
-        ) : (
-          <>
-            <label>New Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+      {success ? (
+        <p className="mt-4 text-sm">
+          Your password has been updated. You may now log in.
+        </p>
+      ) : (
+        <form onSubmit={handleUpdate} className="mt-6 space-y-4">
+          <input
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="input w-full"
+            placeholder="New password"
+          />
 
-            {error && <p className="risk-high mt-1">⚠️ {error}</p>}
+          {error && <p className="text-sm text-red-500">{error}</p>}
 
-            <button className="button mt-2" onClick={handleUpdate}>
-              Update Password
-            </button>
-          </>
-        )}
-      </div>
-    </main>
-  );
+          <button className="btn-primary w-full">
+            Update Password
+          </button>
+        </form>
+      )}
+    </div>
+  )
 }
