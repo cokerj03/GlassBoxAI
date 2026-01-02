@@ -1,39 +1,39 @@
-"use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { getSupabaseBrowser } from "@/lib/db/supabase.browser";
+
+"use client"
+
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { supabaseClient } from "@/lib/supabaseClient"
 
 export default function AccountPage() {
-  const supabase = getSupabaseBrowser();
-  const router = useRouter();
-  const [email, setEmail] = useState<string | null>(null);
+  const router = useRouter()
+  const [email, setEmail] = useState("")
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) router.push("/login?reason=auth");
-      else setEmail(data.user.email);
-    });
-  }, []);
-
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.push("/");
-  }
+    supabaseClient.auth.getUser().then(({ data }) => {
+      if (!data.user) {
+        router.push("/login?reason=auth")
+      } else {
+        setEmail(data.user.email ?? "")
+      }
+    })
+  }, [router])
 
   return (
-    <main className="page-narrow">
-      <div className="card">
-        <h2>Account</h2>
+    <div className="max-w-md mx-auto p-6">
+      <h1 className="text-xl font-semibold">Account</h1>
 
-        <p className="opacity-muted mt-1">
-          Signed in as <strong>{email}</strong>
-        </p>
+      <p className="mt-4 text-sm">
+        Signed in as <strong>{email}</strong>
+      </p>
 
-        <button className="button mt-2" onClick={handleLogout}>
-          Sign Out
-        </button>
-      </div>
-    </main>
-  );
+      <button
+        className="btn-primary mt-6"
+        onClick={() => supabaseClient.auth.signOut()}
+      >
+        Sign out
+      </button>
+    </div>
+  )
 }

@@ -7,7 +7,7 @@
 // Notes:        Keeps components clean and testable.
 // ==========================================
 
-import { supabase } from "./supabase"
+import { supabase } from "./supabaseServer"
 
 export async function getUserSnapshot(userId: string) {
   return supabase
