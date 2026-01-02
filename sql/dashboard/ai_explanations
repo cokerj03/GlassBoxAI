@@ -1,0 +1,14 @@
+-- ==========================================
+-- Table: ai_explanations
+-- Purpose: Stores explainability metadata for
+--          each AI-generated output.
+-- ==========================================
+
+create table ai_explanations (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users on delete cascade,
+  output_id uuid,
+  factors jsonb, -- [{ label, weight }]
+  tradeoff text,
+  created_at timestamp default now()
+);

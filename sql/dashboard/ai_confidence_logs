@@ -1,0 +1,12 @@
+-- ==========================================
+-- Table: ai_confidence_logs
+-- Purpose: Stores confidence scores for each
+--          AI output to visualize trends.
+-- ==========================================
+
+create table ai_confidence_logs (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users on delete cascade,
+  confidence_score numeric,
+  created_at timestamp default now()
+);

@@ -1,0 +1,15 @@
+-- ==========================================
+-- Table: user_intelligence_snapshots
+-- Purpose: Stores summarized insights derived
+--          from a user's AI interaction history.
+-- ==========================================
+
+create table user_intelligence_snapshots (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users on delete cascade,
+  target_role text,
+  strengths text[],
+  growth_areas text[],
+  avg_confidence numeric,
+  updated_at timestamp default now()
+);
